@@ -18,11 +18,13 @@ public class PlayerHealth : LivingEntity
     protected override void OnEnable()
     {
         base.OnEnable();
+        UpdateUI();
     }
     
     public override void RestoreHealth(float newHealth)
     {
         base.RestoreHealth(newHealth);
+        UpdateUI();
     }
 
     private void UpdateUI()
@@ -33,7 +35,12 @@ public class PlayerHealth : LivingEntity
     public override bool ApplyDamage(DamageMessage damageMessage)
     {
         if (!base.ApplyDamage(damageMessage)) return false;
+        
+        EffectManager.Instance.PlayHitEffect(damageMessage.hitPoint,damageMessage.hitNormal,transform,EffectManager.EffectType.Flesh);
 
+        playerAudioPlayer.PlayOneShot(hitClip);
+        
+        UpdateUI();
         
         return true;
     }
@@ -41,5 +48,8 @@ public class PlayerHealth : LivingEntity
     public override void Die()
     {
         base.Die();
+        playerAudioPlayer.PlayOneShot(deathClip);
+        animator.SetTrigger("Die");
+        UpdateUI();
     }
 }
